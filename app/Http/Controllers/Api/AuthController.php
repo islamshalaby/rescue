@@ -3,49 +3,33 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\Auth\RegisterRequest;
+use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'phone' => 'required|numeric',
-            'password' => 'required|min:6'
-        ]);
-        if ($validator->fails()) {
-            return createResponse(422, "", $validator->errors(), null);
-        }
+        $validator = $request->validated();
+        
         $post = $request->all();
 
         $post['password'] = bcrypt($post['password']);
 
         $user = User::create($post);
 
-        return createResponse(200, $user);
+        return createResponse(200, "", null, $user);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $request->validate([
-            'phone' => 'numeric|required',
-            'password' => 'required'
-        ]);
+        $validator = $request->validated();
 
         $credentials = request(['phone', 'password']);
+        
         if (!auth()->attempt($credentials)) {
-            return response()->json([
-                'message' => 'The given data was invalid.',
-                'errors' => [
-                    'password' => [
-                        'Invalid credentials'
-                    ],
-                ]
-            ], 422);
+            return createResponse(422, "Invalid validation", ["credintials" => ["phone is not exist or phone & password does not match"] ], (object)[]);
         }
 
         $user = User::where('phone', $request->phone)->first();
