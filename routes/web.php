@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::get('home', 'Admin\\HomeController@show');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -20,5 +22,11 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');
+
+Route::group(['middleware' => ['auth']], function() {
+    Route::get('/dashboard', 'Admin\\HomeController@show')->name('dashboard');
+    Route::resource('roles', 'Admin\\RoleController');
+    Route::resource('users', 'Admin\\UserController');
+});
 
 require __DIR__.'/auth.php';

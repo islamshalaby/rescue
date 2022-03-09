@@ -18,6 +18,8 @@ class AuthController extends Controller
         $post['password'] = bcrypt($post['password']);
 
         $user = User::create($post);
+        $authToken = $user->createToken('auth-token')->plainTextToken;
+        $user['access_token'] = $authToken;
 
         return createResponse(200, "", null, $user);
     }
@@ -35,8 +37,7 @@ class AuthController extends Controller
         $user = User::where('phone', $request->phone)->first();
         $authToken = $user->createToken('auth-token')->plainTextToken;
 
-        return response()->json([
-            'access_token' => $authToken,
-        ]);
+
+        return createResponse(200, "fetched successfully", null, (object)['access_token' => $authToken,]);
     }
 }
