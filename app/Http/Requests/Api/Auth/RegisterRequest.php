@@ -30,8 +30,8 @@ class RegisterRequest extends MainRequest
     {
         return [
             'name' => 'required',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|numeric|unique:users,phone',
+            'email' => 'required|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'phone' => 'required|numeric|unique:users,phone,NULL,id,deleted_at,NULL',
             'password' => 'required|min:6'
         ];
     }

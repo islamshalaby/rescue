@@ -13,15 +13,25 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/register', 'Api\\AuthController@register');
-Route::post('/login', 'Api\\AuthController@login');
-Route::post('/tokens/create', function (Request $request) {
-    dd($request->user());
-    $token = $request->user()->createToken($request->token_name);
- 
-    return ['token' => $token->plainTextToken];
-});
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+// register
+Route::post('/register/{lang}/{v}', 'Api\\AuthController@register');
+// login
+Route::post('/login/{lang}/{v}', 'Api\\AuthController@login');
+
+Route::group(['middleware' => ['auth:sanctum']], function() {
+
+    // packages
+    Route::group([
+        'prefix' => 'packages'
+    ], function () {
+        Route::get('{lang}/{v}', 'Api\\PackageController@index');
+    });
+    
+    // users
+    Route::group([
+        'prefix' => 'users'
+    ], function () {
+        Route::post('packages-buy/{lang}/{v}', 'Api\\UserController@buy_package');
+    });
 });

@@ -1,7 +1,7 @@
 <?php
-  
-use File;
+
 use Illuminate\Support\Facades\App as FacadesApp;
+use Illuminate\Support\Facades\File;
 
 /**
  * Write code on Method
@@ -45,6 +45,47 @@ if (! function_exists('translate')) {
         } else {
             $result = __($section . '.' . $key);
         }
+        return $result;
+    }
+}
+
+if (! function_exists('my_fatoorah')) {
+    function my_fatoorah($customer_name, $price, $call_back_url, $error_url, $customer_email)
+    {
+        $path='https://apitest.myfatoorah.com/v2/SendPayment';
+        $token="bearer " . env('MY_FATOORAH_TOKEN');
+        if (env('APP_ENV') == 'production') {
+            $path = "https://api.myfatoorah.com/v2/SendPayment";
+        }
+
+        $headers = array(
+            'Authorization:' .$token,
+            'Content-Type:application/json'
+        );
+
+        $fields =array(
+            "CustomerName" => $customer_name,
+            "NotificationOption" => "LNK",
+            "InvoiceValue" => $price,
+            "CallBackUrl" => $call_back_url,
+            "ErrorUrl" => $error_url,
+            "Language" => "AR",
+            "CustomerEmail" => $customer_email
+        );
+        
+        $payload =json_encode($fields);
+        $curl_session =curl_init();
+        curl_setopt($curl_session,CURLOPT_URL, $path);
+        curl_setopt($curl_session,CURLOPT_POST, true);
+        curl_setopt($curl_session,CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl_session,CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl_session,CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_session,CURLOPT_IPRESOLVE, CURLOPT_IPRESOLVE);
+        curl_setopt($curl_session,CURLOPT_POSTFIELDS, $payload);
+        $result=curl_exec($curl_session);
+        curl_close($curl_session);
+        $result = json_decode($result);
+
         return $result;
     }
 }

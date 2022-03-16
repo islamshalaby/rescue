@@ -1,6 +1,6 @@
 @extends('admin.layouts.app')
 
-@section('title' , translate('Role management', 'roles') )
+@section('title' , translate('Package management', 'packages') )
 
 @section('content')
 <div id="tableSimple" class="col-lg-12 col-12 layout-spacing">
@@ -9,16 +9,17 @@
         <div class="widget-header">
             <div class="row">
                 <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                    <h4>{{ translate('Role management', 'roles') }}</h4>
+                    <h4>{{ translate('Package management', 'packages') }}</h4>
                 </div>
             </div>
-            @can('role-create')
+            @can('package-create')
             <div class="row">
                 <div class="col-xl-12 col-md-12 col-sm-12 col-12">
-                    <a class="btn btn-success" href="{{ route('roles.create') }}">{{ translate('Create new role', 'roles') }}</a>
+                    <a class="btn btn-success" href="{{ route('packages.create') }}">{{ translate('Create new package', 'packages') }}</a>
                 </div>
             </div>
             @endcan
+            
         </div>
         <div class="widget-content widget-content-area">
             <div class="table-responsive">
@@ -26,24 +27,24 @@
                     <thead>
                         <tr>
                             <th>No</th>
-                            <th>{{ translate('Name', 'roles') }}</th>
-                            <th width="280px">{{ translate('Action', 'roles') }}</th>
+                            <th>{{ translate('Title', 'packages') }}</th>
+                            <th width="280px">{{ translate('Action', 'packages') }}</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php $i = 0; ?>
-                    @foreach ($roles as $key => $role)
+                    @foreach ($packages as $key => $package)
                     <tr>
                         <td>{{ ++$i }}</td>
-                        <td>{{ $role->name }}</td>
+                        <td>{{ $package->title }}</td>
                         <td>
-                            <a class="btn btn-info" href="{{ route('roles.show',$role->id) }}">{{ translate('Show', 'roles') }}</a>
-                            @can('role-edit')
-                                <a class="btn btn-primary" href="{{ route('roles.edit',$role->id) }}">{{ translate('Edit', 'roles') }}</a>
+                            <a class="btn btn-info" href="{{ route('packages.show',$package->id) }}">{{ translate('Show', 'packages') }}</a>
+                            @can('package-edit')
+                                <a class="btn btn-primary" href="{{ route('packages.edit',$package->id) }}">{{ translate('Edit', 'packages') }}</a>
                             @endcan
-                            @can('role-delete')
-                                {!! Form::open(['method' => 'DELETE','route' => ['roles.destroy', $role->id],'style'=>'display:inline']) !!}
-                                    {!! Form::submit(translate('Delete', 'roles'), ['class' => 'btn btn-danger']) !!}
+                            @can('package-delete')
+                                {!! Form::open(['method' => 'DELETE','route' => ['packages.destroy', $package->id],'style'=>'display:inline']) !!}
+                                    {!! Form::submit(translate('Delete', 'packages'), ['class' => 'btn btn-danger']) !!}
                                 {!! Form::close() !!}
                             @endcan
                         </td>

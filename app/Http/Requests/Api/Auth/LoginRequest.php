@@ -33,4 +33,11 @@ class LoginRequest extends MainRequest
             'password' => 'required'
         ];
     }
+
+    public function messages()
+    {
+        return [
+            // 'phone.numeric' => translate('numeric', 'validation')
+        ];
+    }
 }

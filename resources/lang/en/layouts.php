@@ -9,4 +9,5 @@
   'all rights reserved' => 'All rights reserved',
   'usmart' => 'Usmart',
   'copyright' => 'Copyright',
+  'Packages' => 'Packages',
 );

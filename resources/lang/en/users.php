@@ -7,4 +7,6 @@
   'Roles' => 'Roles',
   'Email' => 'Email',
   'Name' => 'Name',
+  'Create New User' => 'Create New User',
+  'User management' => 'User management',
 );

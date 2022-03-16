@@ -9,35 +9,44 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
+    // register
     public function register(RegisterRequest $request)
     {
-        $validator = $request->validated();
-        
-        $post = $request->all();
-
-        $post['password'] = bcrypt($post['password']);
-
-        $user = User::create($post);
-        $authToken = $user->createToken('auth-token')->plainTextToken;
-        $user['access_token'] = $authToken;
-
-        return createResponse(200, "", null, $user);
+        try{
+            $post = $request->all();
+    
+            $post['password'] = bcrypt($post['password']);
+    
+            $user = User::create($post);
+            $user->assignRole(['user']);
+            $authToken = $user->createToken('auth-token')->plainTextToken;
+            $user['access_token'] = $authToken;
+    
+            return createResponse(200, "", null, $user);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
     }
 
+    // login
     public function login(LoginRequest $request)
     {
-        $validator = $request->validated();
-
-        $credentials = request(['phone', 'password']);
-        
-        if (!auth()->attempt($credentials)) {
-            return createResponse(422, "Invalid validation", ["credintials" => ["phone is not exist or phone & password does not match"] ], (object)[]);
+        try{
+            $credentials = request(['phone', 'password']);
+            
+            if (!auth()->attempt($credentials)) {
+                return createResponse(422, "Invalid validation", ["credintials" => ["phone is not exist or phone & password does not match"] ], (object)[]);
+            }
+    
+            $user = User::where('phone', $request->phone)->first();
+            $authToken = $user->createToken('auth-token')->plainTextToken;
+    
+            return createResponse(200, "fetched successfully", null, (object)['access_token' => $authToken,]);
         }
-
-        $user = User::where('phone', $request->phone)->first();
-        $authToken = $user->createToken('auth-token')->plainTextToken;
-
-
-        return createResponse(200, "fetched successfully", null, (object)['access_token' => $authToken,]);
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+        
     }
 }

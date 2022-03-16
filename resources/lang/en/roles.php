@@ -11,4 +11,6 @@
   'Update' => 'Update',
   'Permission' => 'Permission',
   'Submit' => 'Submit',
+  'Role updated successfully' => 'Role updated successfully',
+  'Role created successfully' => 'Role created successfully',
 );
