@@ -17,6 +17,7 @@ if (! function_exists('createResponse')) {
         if ($data == null) {
             $data = (object)[];
         }
+        
         return response()->json([
             'status' => $status,
             'message' => $message,

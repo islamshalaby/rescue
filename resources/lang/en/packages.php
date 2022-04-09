@@ -7,4 +7,5 @@
   'Period' => 'Period',
   'Edit' => 'Edit',
   'Delete' => 'Delete',
+  'Show' => 'Show',
 );

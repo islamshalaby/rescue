@@ -10,4 +10,8 @@ class Transation extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'package_id', 'price'];
+
+    public function package() {
+        return $this->belongsTo('App\Models\Package', 'package_id');
+    }
 }

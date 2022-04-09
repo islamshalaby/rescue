@@ -8,11 +8,14 @@ use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
+    public function __construct(Request $request)
+    {
+        app()->setLocale($request->lang);
+    }
     // show packages
     public function index(Request $request) {
         try{
-            app()->setLocale($request->lang);
-            $packages = Package::orderBy('id', 'desc')->get();
+            $packages = Package::orderBy('id', 'desc')->get()->makeHidden(['title', 'description']);
     
             return createResponse(200, "fetched successfully", null, $packages);
         }

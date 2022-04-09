@@ -10,20 +10,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Package extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+    protected $hidden = ['title', 'description', 'created_at', 'updated_at', 'deleted_at'];
     public $translatable = ['title', 'description'];
     protected $fillable = ['title', 'description', 'price', 'color', 'period'];
+    protected $appends = ['name', 'details'];
 
     
-    public function getDescriptionAttribute($value): string
+    public function getDetailsAttribute(): string
     {
-        $lang = app()->getLocale();
-        return json_decode($value, true)[$lang];
+        return $this->description;
     }
 
-    public function getTitleAttribute($value): string
+    public function getNameAttribute(): string
     {
-        $lang = app()->getLocale();
-        return json_decode($value, true)[$lang];
+        return $this->title;
     }
 }

@@ -33,5 +33,14 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         'prefix' => 'users'
     ], function () {
         Route::post('packages-buy/{lang}/{v}', 'Api\\UserController@buy_package');
+        Route::get('transactions/{lang}/{v}', 'Api\\UserController@transactions');
+        Route::post('emergency-message/{lang}/{v}', 'Api\\UserController@add_emergency_messages');
+        Route::get('my_account/{lang}/{v}', 'Api\\UserController@user_data');
+        Route::post('technical-support/{lang}/{v}', 'Api\\UserController@technical_support');
+        
     });
+    
 });
+Route::get('/excute_pay' , 'Api\\UserController@excute_pay')->name('excute.pay');
+Route::get('/pay/success' , 'Api\\UserController@pay_sucess')->name('pay.success');
+Route::get('/pay/error' , 'Api\\UserController@pay_error')->name('pay.error');

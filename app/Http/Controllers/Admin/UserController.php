@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
 use Illuminate\Support\Arr;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -45,7 +46,8 @@ class UserController extends Controller
     
         $input = $request->all();
         $input['password'] = Hash::make($input['password']);
-    
+        $today = Carbon::now();
+        $input['package_expire'] = $today->addDays(14);
         $user = User::create($input);
         $user->assignRole($request->input('roles'));
     

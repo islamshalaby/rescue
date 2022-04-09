@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Models\User;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -14,9 +15,9 @@ class AuthController extends Controller
     {
         try{
             $post = $request->all();
-    
+            $today = Carbon::now();
             $post['password'] = bcrypt($post['password']);
-    
+            $post['package_expire'] = $today->addDays(14);
             $user = User::create($post);
             $user->assignRole(['user']);
             $authToken = $user->createToken('auth-token')->plainTextToken;
