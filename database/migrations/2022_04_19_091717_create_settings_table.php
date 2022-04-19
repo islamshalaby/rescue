@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmergencyMessagesTable extends Migration
+class CreateSettingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateEmergencyMessagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('emergency_messages', function (Blueprint $table) {
+        Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('contact_id');
-            $table->text('message');
+            $table->string('phone')->nullable();
+            $table->text('terms_conditions')->nullable();
+            $table->text('about_app')->nullable();
+            $table->string('app_name')->nullable();
+            $table->boolean('show_buy')->default(true);
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ class CreateEmergencyMessagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('emergency_messages');
+        Schema::dropIfExists('settings');
     }
 }

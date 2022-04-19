@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmergencyMessagesTable extends Migration
+class CreateContactsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateEmergencyMessagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('emergency_messages', function (Blueprint $table) {
+        Schema::create('contacts', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
-            $table->integer('contact_id');
-            $table->text('message');
+            $table->string('name')->nullable();
+            $table->string('phone');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateEmergencyMessagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('emergency_messages');
+        Schema::dropIfExists('contacts');
     }
 }

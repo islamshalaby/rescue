@@ -52,4 +52,8 @@ class User extends Authenticatable
     public function package() {
         return $this->belongsTo('App\Models\Package', 'package_id');
     }
+
+    public function emergencyMessages() {
+        return $this->hasMany('App\Models\EmergencyMessage', 'user_id')->with('contact');
+    }
 }

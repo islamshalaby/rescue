@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\User\AddContactsRequest;
 use App\Http\Requests\Api\User\AddEmergencyMessagesRequest;
 use App\Http\Requests\Api\User\BuyPackageRequest;
 use App\Http\Requests\Api\User\CheckPhoneExistenceRequest;
@@ -12,6 +13,7 @@ use App\Http\Requests\Api\User\ResetPasswordRequest;
 use App\Http\Requests\Api\User\TechnicalSupportRequest;
 use App\Http\Requests\Api\User\UpdateImageRequest;
 use App\Http\Requests\Api\User\UpdateProfileRequest;
+use App\Models\Contact;
 use App\Models\EmergencyMessage;
 use App\Models\Package;
 use App\Models\TechnicalSupport;
@@ -91,17 +93,45 @@ class UserController extends Controller
         }
     }
 
+    // add contacts
+    public function add_contacts(AddContactsRequest $request) {
+        try{
+            $post = $request->all();
+            for ($i = 0; $i < count($post['phone']); $i ++) {
+                $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i]]);
+                if (!empty($post['image'][$i])) {
+                    $contact->attachMedia($post['image'][$i]);
+                }
+            }
+
+            return createResponse(200, "fetched successfully", null, null);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
     // add emergency messages
     public function add_emergency_messages(AddEmergencyMessagesRequest $request) {
         try{
             $user = auth()->user();
-            $post = $request->except('image');
+            $post = $request->all();
             $post['user_id'] = $user->id;
             $data = EmergencyMessage::create($post);
-            if ($request->image && !empty($request->image)) {
-                $data->attachMedia($request->image);
-            }
             
+            return createResponse(200, "fetched successfully", null, $data);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // get emergency messages
+    public function get_emergency_messages() {
+        try{
+            $user = auth()->user();
+            $data = $user->emergencyMessages;
+
             return createResponse(200, "fetched successfully", null, $data);
         }
         catch(\Exception $e) {

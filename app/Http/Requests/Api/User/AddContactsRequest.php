@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddEmergencyMessagesRequest extends FormRequest
+class AddContactsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,8 +24,9 @@ class AddEmergencyMessagesRequest extends FormRequest
     public function rules()
     {
         return [
-            "contact_id" => "required|exists:contacts,id",
-            "message" => "required"
+            "name" => "array",
+            "phone" => "required|array",
+            "image" => "array"
         ];
     }
 }
