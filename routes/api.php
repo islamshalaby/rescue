@@ -19,8 +19,7 @@ Route::post('/register/{lang}/{v}', 'Api\\AuthController@register');
 // login
 Route::post('/login/{lang}/{v}', 'Api\\AuthController@login');
 
-Route::group(['middleware' => ['auth:sanctum']], function() {
-
+Route::group(['middleware' => []], function() {
     // packages
     Route::group([
         'prefix' => 'packages'
@@ -37,6 +36,11 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::post('emergency-message/{lang}/{v}', 'Api\\UserController@add_emergency_messages');
         Route::get('my_account/{lang}/{v}', 'Api\\UserController@user_data');
         Route::post('technical-support/{lang}/{v}', 'Api\\UserController@technical_support');
+        Route::post('checkphoneexistance/{lang}/{v}' , 'Api\\UserController@checkphoneexistance');
+        Route::put('resetforgettenpassword/{lang}/{v}' , 'Api\\UserController@resetforgettenpassword');
+        Route::put('resetpassword/{lang}/{v}' , 'Api\\UserController@resetpassword');
+        Route::put('update-profile/{lang}/{v}' , 'Api\\UserController@updateProfile');
+        Route::post('update-profile-image/{lang}/{v}' , 'Api\\UserController@update_image');
         
     });
     

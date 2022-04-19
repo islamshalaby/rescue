@@ -90,3 +90,35 @@ if (! function_exists('my_fatoorah')) {
         return $result;
     }
 }
+
+if (! function_exists('send_notification')) {
+    function send_notification($title , $body , $image , $token){
+
+        $message= $body;
+        $title= $title;
+        $image = $image;
+        $path_to_fcm='https://fcm.googleapis.com/fcm/send';
+        $server_key="AAAAYhqJXnk:APA91bF8y6Yge-5ZAFplQfBNqTsl-vx7sE2HvhnabZCcoiR4r9MU361kmSBYz4PD-1bYNYSIA3QUqLMQKMftAhelk_p5_zAk9AcrXdtUqWpWURm_S1UhfZ_fm2ZXXsgM_CrKxagIcTUE";
+    
+        $headers = array(
+            'Authorization:key=' .$server_key,
+            'Content-Type:application/json'
+        );
+    
+        $fields =array('registration_ids'=>$token,
+        'notification'=>array('title'=>$title,'body'=>$message , 'image'=>$image));
+    
+        $payload =json_encode($fields);
+        $curl_session =curl_init();
+        curl_setopt($curl_session,CURLOPT_URL, $path_to_fcm);
+        curl_setopt($curl_session,CURLOPT_POST, true);
+        curl_setopt($curl_session,CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl_session,CURLOPT_RETURNTRANSFER,true);
+        curl_setopt($curl_session,CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl_session,CURLOPT_IPRESOLVE, CURLOPT_IPRESOLVE);
+        curl_setopt($curl_session,CURLOPT_POSTFIELDS, $payload);
+        $result=curl_exec($curl_session);
+        curl_close($curl_session);
+        return $result;
+    }
+}
