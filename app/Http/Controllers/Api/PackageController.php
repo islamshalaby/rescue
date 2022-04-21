@@ -11,7 +11,7 @@ class PackageController extends Controller
     public function __construct(Request $request)
     {
         app()->setLocale($request->lang);
-        $this->middleware('auth:sanctum')->except('checkphoneexistance');
+        $this->middleware('auth:sanctum')->except('');
     }
     // show packages
     public function index(Request $request) {

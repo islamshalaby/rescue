@@ -248,4 +248,28 @@ class UserController extends Controller
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
         }
     }
+
+    // send messages
+    public function send_messages() {
+        try{
+            $user = auth()->user();
+            $today = \Carbon\Carbon::now();
+            
+            if ($user->package_expire->lte($today)) {
+                return createResponse(406, "قم بالإشتراك فى أحد الباقات", (object)['package_expired' => "قم بالإشتراك فى أحد الباقات"], null);
+            }
+            if (count($user->emergencyMessages) == 0) {
+                return createResponse(406, "لا يوجد رسائل صوارئ مضافة لحسابكم", (object)['empty_messages' => "لا يوجد رسائل صوارئ مضافة لحسابكم"], null);
+            }
+
+            for ($i = 0; $i < count($user->emergencyMessages); $i ++) {
+                send_sms($user->emergencyMessages[$i]->message, $user->emergencyMessages[$i]->contact->phone);
+            }
+
+            return createResponse(200, "fetched successfully", null, null);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
 }

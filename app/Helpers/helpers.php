@@ -122,3 +122,23 @@ if (! function_exists('send_notification')) {
         return $result;
     }
 }
+
+if (! function_exists('send_sms')) {
+    function send_sms($message_body, $phone_number) {
+        $path = "http://smsbox.com/smsgateway/services/messaging.asmx/Http_SendSMS";
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', $path, ['query' => [
+            'username' => env('SMS_BOX_USERNAME'), 
+            'password' => env('SMS_BOX_PASSWORD'),
+            'customerid' => env('SMS_BOX_API_ID'),
+            'sendertext' => "InstaDeal",
+            'messagebody' => $message_body,
+            'recipientnumbers' => $phone_number,
+            'defDate' => '',
+            'isblink' => false,
+            'isflash' => false
+        ]]);
+
+        return $response->getBody();
+    }
+}
