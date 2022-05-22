@@ -49,7 +49,7 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function package() {
+    public function _package() {
         return $this->belongsTo('App\Models\Package', 'package_id');
     }
 

@@ -143,7 +143,7 @@ class UserController extends Controller
     public function user_data() {
         try{
             $user_id = auth()->user()->id;
-            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'package_id')->with('package')->first();
+            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'package_id')->with('_package')->first();
             $user->image = "";
             if ($user->fetchFirstMedia()) {
                 $user->image = $user->fetchFirstMedia()->file_url;
