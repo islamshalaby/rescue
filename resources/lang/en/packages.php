@@ -8,4 +8,6 @@
   'Edit' => 'Edit',
   'Delete' => 'Delete',
   'Show' => 'Show',
+  'Color' => 'Color',
+  'Price' => 'Price',
 );

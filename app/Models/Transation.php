@@ -11,7 +11,7 @@ class Transation extends Model
 
     protected $fillable = ['user_id', 'package_id', 'price'];
 
-    public function package() {
+    public function _package() {
         return $this->belongsTo('App\Models\Package', 'package_id');
     }
 }

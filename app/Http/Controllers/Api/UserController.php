@@ -11,6 +11,8 @@ use App\Http\Requests\Api\User\ExcutePayRequest;
 use App\Http\Requests\Api\User\ResetForgottenPasswordRequest;
 use App\Http\Requests\Api\User\ResetPasswordRequest;
 use App\Http\Requests\Api\User\TechnicalSupportRequest;
+use App\Http\Requests\Api\User\UpdateContactsImageRequest;
+use App\Http\Requests\Api\User\UpdateContactsRequest;
 use App\Http\Requests\Api\User\UpdateImageRequest;
 use App\Http\Requests\Api\User\UpdateProfileRequest;
 use App\Models\Contact;
@@ -84,7 +86,7 @@ class UserController extends Controller
     public function transactions(Request $request) {
         try{
             $user = auth()->user();
-            $data = Transation::where('user_id', $user->id)->with('package')->select('id', 'package_id', 'price', 'created_at')->orderBy('id', 'desc')->get();
+            $data = Transation::where('user_id', $user->id)->with('_package')->select('id', 'package_id', 'price', 'created_at')->orderBy('id', 'desc')->get();
 
             return createResponse(200, "fetched successfully", null, $data);
         }
@@ -97,12 +99,91 @@ class UserController extends Controller
     public function add_contacts(AddContactsRequest $request) {
         try{
             $post = $request->all();
+            $post['user_id'] = auth()->user()->id;
             for ($i = 0; $i < count($post['phone']); $i ++) {
                 $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i]]);
                 if (!empty($post['image'][$i])) {
                     $contact->attachMedia($post['image'][$i]);
                 }
             }
+
+            return createResponse(200, "fetched successfully", null, null);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // get contacts
+    public function get_contacts() {
+        try{
+            $user = auth()->user();
+            $data = Contact::where('user_id', $user->id)->select('id', 'name', 'phone')->get()->makeHidden('image');
+            
+            return createResponse(200, "fetched successfully", null, $data);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // get contact details
+    public function contact_details(Request $request) {
+        try{
+            $user = auth()->user();
+            $data = Contact::where('user_id', $user->id)->where('id', $request->id)->select('id', 'name', 'phone')->first();
+            
+            if ($data->image == null) {
+                $data->image = (object)[];
+            }
+            
+            return createResponse(200, "fetched successfully", null, $data);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // update contact
+    public function update_contact(UpdateContactsRequest $request) {
+        try{
+            $contact = Contact::where('user_id', auth()->user()->id)->where('id', $request->id)->first();
+            if (!$contact) {
+                return createResponse(406, "Access denied", (object)['error' => ["Access denied"]], null);
+            }
+            $post = $request->except('id');
+            $contact->update($post);
+            return createResponse(200, "fetched successfully", null, $contact);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // update contact image
+    public function update_contact_image(UpdateContactsImageRequest $request) {
+        try{
+            $contact = Contact::where('user_id', auth()->user()->id)->where('id', $request->id)->first();
+            if (!$contact) {
+                return createResponse(406, "Access denied", (object)['error' => ["Access denied"]], null);
+            }
+            $contact->updateMedia($request->image);
+
+            return createResponse(200, "fetched successfully", null, $contact);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // delete contact
+    public function delete_contact(Request $request) {
+        try{
+            $contact = Contact::where('user_id', auth()->user()->id)->where('id', $request->id)->first();
+            if (!$contact) {
+                return createResponse(406, "Access denied", (object)['error' => ["Access denied"]], null);
+            }
+            $contact->delete();
 
             return createResponse(200, "fetched successfully", null, null);
         }
@@ -143,7 +224,7 @@ class UserController extends Controller
     public function user_data() {
         try{
             $user_id = auth()->user()->id;
-            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'package_id')->with('_package')->first();
+            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'package_id', 'package_expire')->with('_package')->first();
             $user->image = "";
             if ($user->fetchFirstMedia()) {
                 $user->image = $user->fetchFirstMedia()->file_url;

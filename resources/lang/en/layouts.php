@@ -10,4 +10,5 @@
   'usmart' => 'Usmart',
   'copyright' => 'Copyright',
   'Packages' => 'Packages',
+  'Sliders' => 'Sliders',
 );

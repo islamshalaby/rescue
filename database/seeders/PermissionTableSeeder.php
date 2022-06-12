@@ -26,7 +26,11 @@ class PermissionTableSeeder extends Seeder
             'package-list',
             'package-create',
             'package-edit',
-            'package-delete'
+            'package-delete',
+            'slider-list',
+            'slider-create',
+            'slider-edit',
+            'slider-delete'
          ];
       
          foreach ($permissions as $permission) {

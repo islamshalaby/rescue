@@ -56,4 +56,8 @@ class User extends Authenticatable
     public function emergencyMessages() {
         return $this->hasMany('App\Models\EmergencyMessage', 'user_id')->with('contact');
     }
+
+    public function contacts() {
+        return $this->hasMany('App\Models\Contact', 'user_id');
+    }
 }

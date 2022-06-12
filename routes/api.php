@@ -34,6 +34,11 @@ Route::group(['middleware' => []], function() {
         Route::post('packages-buy/{lang}/{v}', 'Api\\UserController@buy_package');
         Route::get('transactions/{lang}/{v}', 'Api\\UserController@transactions');
         Route::post('contacts/{lang}/{v}', 'Api\\UserController@add_contacts');
+        Route::get('contacts/{lang}/{v}', 'Api\\UserController@get_contacts');
+        Route::get('contacts/{id}/{lang}/{v}', 'Api\\UserController@contact_details');
+        Route::put('contacts/{lang}/{v}', 'Api\\UserController@update_contact');
+        Route::post('contacts/image/{lang}/{v}', 'Api\\UserController@update_contact_image');
+        Route::delete('contacts/{id}/{lang}/{v}', 'Api\\UserController@delete_contact');
         Route::post('emergency-message/{lang}/{v}', 'Api\\UserController@add_emergency_messages');
         Route::get('emergency-message/{lang}/{v}', 'Api\\UserController@get_emergency_messages');
         Route::get('my_account/{lang}/{v}', 'Api\\UserController@user_data');
@@ -44,7 +49,12 @@ Route::group(['middleware' => []], function() {
         Route::put('update-profile/{lang}/{v}' , 'Api\\UserController@updateProfile');
         Route::post('update-profile-image/{lang}/{v}' , 'Api\\UserController@update_image');
         Route::get('send-messages/{lang}/{v}', 'Api\\UserController@send_messages');
-        
+    });
+
+    Route::group([
+        'prefix' => 'home'
+    ], function () {
+        Route::get('slider/{lang}/{v}', 'Api\\HomeController@slider');
     });
     
 });

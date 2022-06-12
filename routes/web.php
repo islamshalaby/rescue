@@ -22,6 +22,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', 'Admin\\RoleController');
     Route::resource('users', 'Admin\\UserController');
     Route::resource('packages', 'Admin\\PackageController');
+    Route::resource('sliders', 'Admin\\SliderController');
 });
 
 require __DIR__.'/auth.php';

@@ -6,14 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use CloudinaryLabs\CloudinaryLaravel\MediaAlly;
 
-class Contact extends Model
+class Slider extends Model
 {
     use HasFactory, MediaAlly;
-    protected $fillable = ['name', 'phone', 'user_id'];
+
+    protected $fillable = ['content'];
     protected $appends = ['image'];
 
     public function getImageAttribute() {
-        $contact = Contact::where('id', $this->id)->first();
-        return $contact->fetchFirstMedia() ? $contact->fetchFirstMedia() : (object)[];
+        $slider = Slider::where('id', $this->id)->first();
+        return $slider->fetchFirstMedia() ? $slider->fetchFirstMedia() : (object)[];
     }
 }
