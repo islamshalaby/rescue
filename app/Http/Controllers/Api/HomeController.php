@@ -23,6 +23,5 @@ class HomeController extends Controller
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
         }
-        
     }
 }

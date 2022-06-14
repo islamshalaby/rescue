@@ -99,9 +99,9 @@ class UserController extends Controller
     public function add_contacts(AddContactsRequest $request) {
         try{
             $post = $request->all();
-            $post['user_id'] = auth()->user()->id;
+            $user_id = auth()->user()->id;
             for ($i = 0; $i < count($post['phone']); $i ++) {
-                $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i]]);
+                $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i], 'user_id' => $user_id]);
                 if (!empty($post['image'][$i])) {
                     $contact->attachMedia($post['image'][$i]);
                 }
