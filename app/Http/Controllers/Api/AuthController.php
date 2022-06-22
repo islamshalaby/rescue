@@ -40,10 +40,15 @@ class AuthController extends Controller
                 return createResponse(422, "Invalid validation", ["credintials" => ["phone is not exist or phone & password does not match"] ], (object)[]);
             }
     
-            $user = User::where('phone', $request->phone)->first();
+            $user = User::where('phone', $request->phone)->select('id', 'name', 'phone', 'package_id', 'package_expire')->with('_package')->first();
             $authToken = $user->createToken('auth-token')->plainTextToken;
+            $user->image = "";
+            if ($user->fetchFirstMedia()) {
+                $user->image = $user->fetchFirstMedia()->file_url;
+            }
+            $user->access_token = $authToken;
     
-            return createResponse(200, "fetched successfully", null, (object)['access_token' => $authToken,]);
+            return createResponse(200, "fetched successfully", null, $user);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
