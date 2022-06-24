@@ -347,7 +347,6 @@ class UserController extends Controller
                     $phone = str_replace('+', '', $user->emergencyMessages[$i]->contact->phone);
                     $phone = str_replace(' ', '', $phone);
                     $phone = ltrim($phone, "00");
-                    dd($phone);
                     send_sms($user->emergencyMessages[$i]->message, $user->emergencyMessages[$i]->contact->phone);
                 }
             }
