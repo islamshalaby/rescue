@@ -342,9 +342,14 @@ class UserController extends Controller
             if (count($user->emergencyMessages) == 0) {
                 return createResponse(406, "لا يوجد رسائل صوارئ مضافة لحسابكم", (object)['empty_messages' => "لا يوجد رسائل صوارئ مضافة لحسابكم"], null);
             }
-
             for ($i = 0; $i < count($user->emergencyMessages); $i ++) {
-                send_sms($user->emergencyMessages[$i]->message, $user->emergencyMessages[$i]->contact->phone);
+                if ($user->emergencyMessages[$i]->contact) {
+                    $phone = str_replace('+', '', $user->emergencyMessages[$i]->contact->phone);
+                    $phone = str_replace(' ', '', $phone);
+                    $phone = ltrim($phone, "00");
+                    dd($phone);
+                    send_sms($user->emergencyMessages[$i]->message, $user->emergencyMessages[$i]->contact->phone);
+                }
             }
 
             return createResponse(200, "fetched successfully", null, null);
