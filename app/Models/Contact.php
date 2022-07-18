@@ -16,4 +16,8 @@ class Contact extends Model
         $contact = Contact::where('id', $this->id)->first();
         return $contact->fetchFirstMedia() ? $contact->fetchFirstMedia() : (object)[];
     }
+
+    public function emergency() {
+        return $this->hasOne('App\Models\EmergencyMessage', 'contact_id');
+    }
 }

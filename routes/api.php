@@ -19,6 +19,8 @@ Route::post('/register/{lang}/{v}', 'Api\\AuthController@register');
 // login
 Route::post('/login/{lang}/{v}', 'Api\\AuthController@login');
 
+
+
 Route::group(['middleware' => []], function() {
     // packages
     Route::group([

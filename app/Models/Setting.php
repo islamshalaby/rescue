@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Setting extends Model
 {
     use HasFactory, HasTranslations;
-    protected $fillable = ['phone', 'terms_conditions', 'about_app', 'app_name', 'show_buy'];
+    protected $fillable = ['phone', 'terms_conditions', 'about_app', 'app_name', 'show_buy', 'emergency_message'];
     public $translatable = ['terms_conditions', 'about_app', 'app_name'];
 
 }

@@ -11,4 +11,7 @@
   'copyright' => 'Copyright',
   'Packages' => 'Packages',
   'Sliders' => 'Sliders',
+  'About app' => 'About app',
+  'Terms and conditions' => 'Terms and conditions',
+  'Settings' => 'Settings',
 );

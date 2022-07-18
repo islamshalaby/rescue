@@ -51,7 +51,7 @@ if (! function_exists('translate')) {
 }
 
 if (! function_exists('my_fatoorah')) {
-    function my_fatoorah($customer_name, $price, $call_back_url, $error_url, $customer_email)
+    function my_fatoorah($customer_name, $price, $call_back_url, $error_url)
     {
         $path='https://apitest.myfatoorah.com/v2/SendPayment';
         $token="bearer " . env('MY_FATOORAH_TOKEN');
@@ -71,7 +71,7 @@ if (! function_exists('my_fatoorah')) {
             "CallBackUrl" => $call_back_url,
             "ErrorUrl" => $error_url,
             "Language" => "AR",
-            "CustomerEmail" => $customer_email
+            // "CustomerEmail" => $customer_email
         );
         
         $payload =json_encode($fields);

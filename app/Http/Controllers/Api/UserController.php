@@ -10,6 +10,7 @@ use App\Http\Requests\Api\User\CheckPhoneExistenceRequest;
 use App\Http\Requests\Api\User\ExcutePayRequest;
 use App\Http\Requests\Api\User\ResetForgottenPasswordRequest;
 use App\Http\Requests\Api\User\ResetPasswordRequest;
+use App\Http\Requests\Api\User\SendMessagesRequest;
 use App\Http\Requests\Api\User\TechnicalSupportRequest;
 use App\Http\Requests\Api\User\UpdateContactsImageRequest;
 use App\Http\Requests\Api\User\UpdateContactsRequest;
@@ -18,6 +19,7 @@ use App\Http\Requests\Api\User\UpdateProfileRequest;
 use App\Models\Contact;
 use App\Models\EmergencyMessage;
 use App\Models\Package;
+use App\Models\Setting;
 use App\Models\TechnicalSupport;
 use App\Models\Transation;
 use App\Models\User;
@@ -30,7 +32,7 @@ class UserController extends Controller
     public function __construct(Request $request)
     {
         app()->setLocale($request->lang);
-        $this->middleware('auth:sanctum')->except(['checkphoneexistance', 'resetforgettenpassword']);
+        $this->middleware('auth:sanctum')->except(['checkphoneexistance', 'resetforgettenpassword', 'excute_pay', 'pay_sucess', 'pay_error']);
     }
     // buy package
     public function buy_package(BuyPackageRequest $request) {
@@ -40,7 +42,7 @@ class UserController extends Controller
             $root_url = $request->root();
             $success_url = $root_url."/api/excute_pay?user_id=" . $user->id . "&package_id=" . $request->package_id . "&price=" . $package->price;
             $error_url = $root_url."/api/pay/error";
-            $payment = my_fatoorah($user->name, $package->price, $success_url, $error_url, $user->email);
+            $payment = my_fatoorah($user->name, $package->price, $success_url, $error_url);
             
             $data['url'] = $payment->Data->InvoiceURL;
     
@@ -183,6 +185,7 @@ class UserController extends Controller
             if (!$contact) {
                 return createResponse(406, "Access denied", (object)['error' => ["Access denied"]], null);
             }
+            $contact->emergency->delete();
             $contact->delete();
 
             return createResponse(200, "fetched successfully", null, null);
@@ -224,7 +227,7 @@ class UserController extends Controller
     public function user_data() {
         try{
             $user_id = auth()->user()->id;
-            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'package_id', 'package_expire')->with('_package')->first();
+            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'email', 'package_id', 'package_expire')->with('_package')->first();
             $user->image = "";
             if ($user->fetchFirstMedia()) {
                 $user->image = $user->fetchFirstMedia()->file_url;
@@ -331,7 +334,7 @@ class UserController extends Controller
     }
 
     // send messages
-    public function send_messages() {
+    public function send_messages(SendMessagesRequest $request) {
         try{
             $user = auth()->user();
             $today = \Carbon\Carbon::now();
@@ -339,19 +342,24 @@ class UserController extends Controller
             if ($user->package_expire->lte($today)) {
                 return createResponse(406, "قم بالإشتراك فى أحد الباقات", (object)['package_expired' => "قم بالإشتراك فى أحد الباقات"], null);
             }
-            if (count($user->emergencyMessages) == 0) {
-                return createResponse(406, "لا يوجد رسائل صوارئ مضافة لحسابكم", (object)['empty_messages' => "لا يوجد رسائل صوارئ مضافة لحسابكم"], null);
+            if (count($user->contacts) == 0) {
+                return createResponse(406, "قم بإضافة أرقام الإتصال", (object)['package_expired' => "قم بإضافة أرقام الإتصال"], null);
             }
-            for ($i = 0; $i < count($user->emergencyMessages); $i ++) {
-                if ($user->emergencyMessages[$i]->contact) {
-                    $phone = str_replace('+', '', $user->emergencyMessages[$i]->contact->phone);
-                    $phone = str_replace(' ', '', $phone);
-                    $phone = ltrim($phone, "00");
-                    send_sms($user->emergencyMessages[$i]->message, $user->emergencyMessages[$i]->contact->phone);
-                }
+            $setting = Setting::where('id', 1)->select('emergency_message')->first();
+            $message = "$setting->emergency_message [ https://www.google.com/maps/?q=$request->lat,$request->long ]";
+            for ($i = 0; $i < count($user->contacts); $i ++) {
+                $phone = str_replace('+', '', $user->contacts[$i]->phone);
+                $phone = str_replace(' ', '', $phone);
+                $phone = ltrim($phone, "00");
+                send_sms($message, $user->contacts[$i]->phone);
+                EmergencyMessage::create([
+                    'contact_id' => $user->contacts[$i]->id,
+                    'user_id' => $user->id,
+                    'message' => $message
+                ]);
             }
 
-            return createResponse(200, "fetched successfully", null, null);
+            return createResponse(200, "sent successfully", null, null);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
