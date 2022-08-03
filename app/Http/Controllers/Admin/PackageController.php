@@ -67,7 +67,8 @@ class PackageController extends Controller
             'description' => $description,
             'price' => $request->price,
             'color' => $request->color,
-            'period' => $request->period
+            'period' => $request->period,
+            'contacts_number' => $request->contacts_number
         ];
 
         Package::create($post);

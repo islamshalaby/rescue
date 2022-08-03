@@ -38,6 +38,9 @@ class UserController extends Controller
     public function buy_package(BuyPackageRequest $request) {
         try{
             $user = auth()->user();
+            if (!$user->package_expire->isPast() && !empty($user->package_id)) {
+                return createResponse(406, "أنت مشترك فى باقة بالفعل", (object)['error' => ["أنت مشترك فى باقة بالفعل"]], null);
+            }
             $package = Package::where('id', $request->package_id)->select('price')->first();
             $root_url = $request->root();
             $success_url = $root_url."/api/excute_pay?user_id=" . $user->id . "&package_id=" . $request->package_id . "&price=" . $package->price;
@@ -101,9 +104,17 @@ class UserController extends Controller
     public function add_contacts(AddContactsRequest $request) {
         try{
             $post = $request->all();
-            $user_id = auth()->user()->id;
+            $user = auth()->user();
+            $setting = Setting::where('id', 1)->select('free_contacts_number')->first();
+            $contacts_number = $setting->free_contacts_number;
+            if (!empty($user->package_id) && !$user->package_expire->isPast()) {
+                $contacts_number = $user->_package->contacts_number;
+            }
+            if (count($user->contacts) > ($contacts_number + count($post['phone']))) {
+                return createResponse(406, "الحد الأقصى لعدد الإرقام " . $user->_package->contacts_number, (object)['error' => ["الحد الأقصى لعدد الإرقام " . $user->_package->contacts_number]], null);
+            }
             for ($i = 0; $i < count($post['phone']); $i ++) {
-                $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i], 'user_id' => $user_id]);
+                $contact = Contact::create(['name' => $post['name'][$i], 'phone' => $post['phone'][$i], 'user_id' => $user->id]);
                 if (!empty($post['image'][$i])) {
                     $contact->attachMedia($post['image'][$i]);
                 }
@@ -185,10 +196,13 @@ class UserController extends Controller
             if (!$contact) {
                 return createResponse(406, "Access denied", (object)['error' => ["Access denied"]], null);
             }
-            $contact->emergency->delete();
+            if ($contact->emergency) {
+                $contact->emergency->delete();
+            }
+            
             $contact->delete();
 
-            return createResponse(200, "fetched successfully", null, null);
+            return createResponse(200, "deleted successfully", null, null);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
@@ -227,13 +241,37 @@ class UserController extends Controller
     public function user_data() {
         try{
             $user_id = auth()->user()->id;
-            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'email', 'package_id', 'package_expire')->with('_package')->first();
+            $user = User::where('id', $user_id)->select('id', 'name', 'phone', 'email', 'package_id', 'package_expire')->with('_package')->first()->makeHidden("_package");
             $user->image = "";
+            
             if ($user->fetchFirstMedia()) {
                 $user->image = $user->fetchFirstMedia()->file_url;
             }
-
-            return createResponse(200, "fetched successfully", null, $user);
+            $package = $user->_package;
+            if (empty($user->_package)) {
+                $package = (object)[
+                    "id"=> 0,
+                    "price"=> 0,
+                    "color"=> "",
+                    "period"=> 14,
+                    "contacts_number"=> 0,
+                    "name"=> "تجريبية 14 يوم",
+                    "details"=> ""
+                ];
+            }
+            $data = (object)[
+                "id" => $user->id,
+                "name" => $user->name,
+                "_package" => $package,
+                "phone" => $user->phone,
+                "email" => $user->email,
+                "package_expire" => $user->package_expire,
+                "image" => $user->image
+            ];
+            // dd(empty($user->_package));
+            
+// dd($data);
+            return createResponse(200, "fetched successfully", null, $data);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
@@ -310,11 +348,11 @@ class UserController extends Controller
     public function updateProfile(UpdateProfileRequest $request) {
         try{
             $post = $request->all();
-
+            $post['phone'] = str_replace('+', '', $post['phone']);
             $user = user::where('id', auth()->user()->id)->first();
             $user->update($post);
 
-            return createResponse(200, "fetched successfully", null, $user);
+            return createResponse(200, "تم التعديل بنجاح", null, $user);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
@@ -346,12 +384,16 @@ class UserController extends Controller
                 return createResponse(406, "قم بإضافة أرقام الإتصال", (object)['package_expired' => "قم بإضافة أرقام الإتصال"], null);
             }
             $setting = Setting::where('id', 1)->select('emergency_message')->first();
-            $message = "$setting->emergency_message [ https://www.google.com/maps/?q=$request->lat,$request->long ]";
+            $message = $setting->emergency_message;
+            $message = str_replace("(name)",$user->name,$message);
+            $message = str_replace("(phone)",$user->phone,$message);
+            $message = str_replace("(location)","[ https://www.google.com/maps/?q=$request->lat,$request->long ]",$message);
             for ($i = 0; $i < count($user->contacts); $i ++) {
                 $phone = str_replace('+', '', $user->contacts[$i]->phone);
                 $phone = str_replace(' ', '', $phone);
                 $phone = ltrim($phone, "00");
                 send_sms($message, $user->contacts[$i]->phone);
+                
                 EmergencyMessage::create([
                     'contact_id' => $user->contacts[$i]->id,
                     'user_id' => $user->id,
@@ -360,6 +402,23 @@ class UserController extends Controller
             }
 
             return createResponse(200, "sent successfully", null, null);
+        }
+        catch(\Exception $e) {
+            return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);
+        }
+    }
+
+    // contacts number
+    public function contacts_number() {
+        try{
+            $user = auth()->user();
+            $setting = Setting::where('id', 1)->select('free_contacts_number')->first();
+            $data['contacts_number'] = $setting->free_contacts_number;
+            if (!empty($user->package_id) && !$user->package_expire->isPast()) {
+                $data['contacts_number'] = $user->_package->contacts_number;
+            }
+
+            return createResponse(200, "fetched successfully", null, $data);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);

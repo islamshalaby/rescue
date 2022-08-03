@@ -29,6 +29,7 @@
                         <tr>
                           <th>No</th>
                           <th>{{ translate('Name', 'users') }}</th>
+                          <th>{{ translate('Phone number', 'users') }}</th>
                           <th>{{ translate('Email', 'users') }}</th>
                           <th>{{ translate('Roles', 'users') }}</th>
                           <th width="280px">{{ translate('Action', 'users') }}</th>   
@@ -42,6 +43,7 @@
                        <tr>
                         <td>{{ ++$i }}</td>
                         <td>{{ $user->name }}</td>
+                        <td>{{ $user->phone }}</td>
                         <td>{{ $user->email }}</td>
                         <td>
                           @if(!empty($user->getRoleNames()))

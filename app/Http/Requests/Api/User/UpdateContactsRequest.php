@@ -25,7 +25,7 @@ class UpdateContactsRequest extends FormRequest
     {
         return [
             "name" => "required",
-            "phone" => "required|regex:/(01)[0-9]{9}/",
+            "phone" => "required",
             "id" => "required"
         ];
     }

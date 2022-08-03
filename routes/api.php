@@ -51,12 +51,16 @@ Route::group(['middleware' => []], function() {
         Route::put('update-profile/{lang}/{v}' , 'Api\\UserController@updateProfile');
         Route::post('update-profile-image/{lang}/{v}' , 'Api\\UserController@update_image');
         Route::get('send-messages/{lang}/{v}', 'Api\\UserController@send_messages');
+        Route::get('contacts-number/{lang}/{v}', 'Api\\UserController@contacts_number');
+        
     });
 
     Route::group([
         'prefix' => 'home'
     ], function () {
         Route::get('slider/{lang}/{v}', 'Api\\HomeController@slider');
+        Route::get('show_buy/{lang}/{v}', 'Api\\HomeController@show_buy');
+        
     });
     
 });

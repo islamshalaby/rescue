@@ -12,7 +12,7 @@ class Package extends Model
     use HasFactory, HasTranslations, SoftDeletes;
     protected $hidden = ['title', 'description', 'created_at', 'updated_at', 'deleted_at'];
     public $translatable = ['title', 'description'];
-    protected $fillable = ['title', 'description', 'price', 'color', 'period'];
+    protected $fillable = ['title', 'description', 'price', 'color', 'period', 'contacts_number'];
     protected $appends = ['name', 'details'];
 
     

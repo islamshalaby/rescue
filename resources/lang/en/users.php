@@ -9,4 +9,5 @@
   'Name' => 'Name',
   'Create New User' => 'Create New User',
   'User management' => 'User management',
+  'Phone number' => 'Phone number',
 );

@@ -26,7 +26,7 @@ class UpdateProfileRequest extends FormRequest
         return [
             "name" => "required",
             "email" => "required|unique:users,email," . auth()->user()->id . ",id,deleted_at,NULL",
-            "phone" => "required|numeric|regex:/(01)[0-9]{9}/|unique:users,phone," . auth()->user()->id . ",id,deleted_at,NULL",
+            "phone" => "required|numeric|unique:users,phone," . auth()->user()->id . ",id,deleted_at,NULL",
             "image" => ""
         ];
     }

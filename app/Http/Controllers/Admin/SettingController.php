@@ -76,7 +76,7 @@ class SettingController extends Controller
 
     public function setting_edit()
     {
-        $data['setting'] = Setting::where('id', 1)->select('id', 'emergency_message')->first();
+        $data['setting'] = Setting::where('id', 1)->select('id', 'emergency_message', 'show_buy', 'free_contacts_number')->first();
         
         return view('admin.setting.index', compact('data'));
     }
@@ -84,13 +84,19 @@ class SettingController extends Controller
     public function setting_update(Request $request)
     {
         $this->validate($request, [
-            'emergency_message' => 'required'
+            'emergency_message' => 'required',
+            'free_contacts_number' => 'required'
         ]);
         
         $setting = Setting::where('id', 1)->select('id', 'emergency_message')->first();
+        $post = $request->all();
+        $show_buy = 0; 
+        if ($request->show_buy) {
+            $show_buy = 1;
+        }
+        $post['show_buy'] = $show_buy;
         
-        
-        $setting->update($request->all());
+        $setting->update($post);
         
         return redirect()->back()->
         with('success', translate('Terms updated successfully', 'settings'));

@@ -38,6 +38,10 @@
             <label for="period">{{ translate('Period', 'packages') }}:</label>
             <input required type="number" name="period" class="form-control" id="period" placeholder="{{ translate('Period', 'packages') }}" value="" >
         </div>
+        <div class="form-group mb-4">
+            <label for="contacts_number">{{ translate('Contacts number', 'packages') }}:</label>
+            <input required type="number" name="contacts_number" class="form-control" id="contacts_number" placeholder="{{ translate('Contacts number', 'packages') }}" value="" >
+        </div>
         
         <input type="submit" value="{{ translate('Submit', 'packages') }}" class="btn btn-primary">
     </form>

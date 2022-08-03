@@ -25,7 +25,7 @@ class ResetForgottenPasswordRequest extends FormRequest
     {
         return [
             "password" => "required",
-            "phone" => "required|regex:/(01)[0-9]{9}/"
+            "phone" => "required"
         ];
     }
 }

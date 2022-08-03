@@ -137,9 +137,9 @@ if (! function_exists('send_sms')) {
             'defDate' => '',
             'isblink' => false,
             'isflash' => false
-        ]]);
+        ],'debug' => true]);
         // http://smsbox.com/smsgateway/services/messaging.asmx/Http_SendSMS?username=InstadealApp&password=instadeal@2021&customerid=2195&sendertext=InstaDeal&messagebody={message body}&recipientnumbers={phone number}&isblink=false&isflash=false&defDate=
-
-        return $response->getBody();
+        $res = json_decode((string) $response->getBody(), true);
+        return $res;
     }
 }

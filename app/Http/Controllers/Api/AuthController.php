@@ -15,6 +15,7 @@ class AuthController extends Controller
     {
         try{
             $post = $request->all();
+            $post['phone'] = str_replace('+', '', $post['phone']);
             $today = Carbon::now();
             $post['password'] = bcrypt($post['password']);
             $post['package_expire'] = $today->addDays(14);
@@ -34,8 +35,8 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         try{
-            $credentials = request(['phone', 'password']);
-            
+            $request->phone = str_replace('+', '', $request->phone);
+            $credentials = ["phone" => $request->phone, "password" => $request->password];
             if (!auth()->attempt($credentials)) {
                 return createResponse(422, "Invalid validation", ["credintials" => ["phone is not exist or phone & password does not match"] ], (object)[]);
             }
@@ -47,8 +48,30 @@ class AuthController extends Controller
                 $user->image = $user->fetchFirstMedia()->file_url;
             }
             $user->access_token = $authToken;
+            $package = $user->_package;
+            if (empty($user->_package)) {
+                $package = (object)[
+                    "id"=> 0,
+                    "price"=> 0,
+                    "color"=> "",
+                    "period"=> 14,
+                    "contacts_number"=> 0,
+                    "name"=> "تجريبية 14 يوم",
+                    "details"=> ""
+                ];
+            }
+            $data = (object)[
+                "id" => $user->id,
+                "name" => $user->name,
+                "_package" => $package,
+                "phone" => $user->phone,
+                "email" => $user->email,
+                "package_expire" => $user->package_expire,
+                "image" => $user->image,
+                "access_token" => $user->access_token
+            ];
     
-            return createResponse(200, "fetched successfully", null, $user);
+            return createResponse(200, "fetched successfully", null, $data);
         }
         catch(\Exception $e) {
             return createResponse(406, $e->getMessage(), (object)['error' => $e->getMessage()], null);

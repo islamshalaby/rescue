@@ -29,7 +29,8 @@ class PackageRequest extends FormRequest
             'description' => 'required|array|min:1',
             'price' => 'required|regex:/^[0-9]+(\.[0-9][0-9]?)?$/',
             'color' => 'required',
-            'period' => 'required|numeric'
+            'period' => 'required|numeric',
+            'contacts_number' => 'required|numeric'
         ];
     }
 }
